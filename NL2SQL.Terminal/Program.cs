@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
 using Azure.Core;
+using ConsoleTables;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -56,7 +57,7 @@ static async Task<string> GenerateTsqlQuery(Kernel kernel, KernelFunction nl2Tsq
     return generatedQuery!;
 }
 
-static void ExecuteQuery(string generatedQuery)
+void ExecuteQuery(string generatedQuery)
 {
     Console.ForegroundColor = ConsoleColor.Red;
     Console.WriteLine("+++++++++ The Results of the Query ++++++++\n");
@@ -66,12 +67,15 @@ static void ExecuteQuery(string generatedQuery)
         try
         {
             var queryResult = db.Query(generatedQuery);
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-            var json = JsonSerializer.Serialize(queryResult, options);
-            Console.WriteLine(json);
+
+            TablePrinter(queryResult);
+
+            //var options = new JsonSerializerOptions
+            //{
+            //    WriteIndented = true
+            //};
+            //var json = JsonSerializer.Serialize(queryResult, options);
+            //Console.WriteLine(json);
         }
         catch (Exception ex)
         {
@@ -81,4 +85,21 @@ static void ExecuteQuery(string generatedQuery)
     }
     Console.WriteLine("\n+++++++++++++++++++++++++++++++++++++++++++");
     Console.ForegroundColor = ConsoleColor.White;
+}
+
+void TablePrinter(IEnumerable<dynamic> queryResult)
+{
+    IDictionary<string, object> propertyValues = (IDictionary<string, object>)queryResult.First();
+    string[] propertyNames = propertyValues.Keys.ToArray();
+
+    var table = new ConsoleTable(propertyNames);
+
+    foreach (var item in queryResult)
+    {
+        IDictionary<string, object> dict = (IDictionary<string, object>)item;
+
+        var row = dict.Values.Select(value => value?.ToString()).ToArray();
+        table.AddRow(row);
+    }
+    table.Write();
 }
