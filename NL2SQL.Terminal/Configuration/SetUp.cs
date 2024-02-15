@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace NL2SQL.Terminal.Configuration;
 public static class SetUp
 {
-    public static (AzureKeyCredential? azureKeyCredential, string? deploymentName, Uri? endpoint) LoadConfiguration()
+    public static (IConfiguration config, AzureKeyCredential? azureKeyCredential, string? deploymentName, Uri? endpoint) LoadConfiguration()
     {
-        IConfigurationRoot config = new ConfigurationBuilder()
+        IConfiguration config = new ConfigurationBuilder()
             .AddUserSecrets<Program>()
             .Build();
 
@@ -19,6 +19,6 @@ public static class SetUp
         string? deploymentName = config["AzureOpenAI:DeploymentName"];
         Uri? endpoint = new Uri(config["AzureOpenAI:Endpoint"]);
 
-        return (azureKeyCredential, deploymentName, endpoint);
+        return (config, azureKeyCredential, deploymentName, endpoint);
     }
 }

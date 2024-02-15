@@ -22,4 +22,8 @@
 		<EmbeddedResource Include="Prompts\**\*.yaml" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\NL2SQL.Infra\NL2SQL.Infra.csproj" />
+	</ItemGroup>
+
 </Project>
