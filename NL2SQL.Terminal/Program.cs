@@ -32,26 +32,53 @@ KernelFunction nl2TsqlTranslator = kernel.CreateFunctionFromPromptYaml(
 Terminal.PrintAssistantMessage("Hello! I am an assistant that let's you use natural language to query the Northwind Sql Server database. How can I be of use to you?");
 string request = Terminal.GetUserInput();
 
-Console.ForegroundColor = ConsoleColor.Yellow;
-Console.WriteLine("++++++++ The Generated T-SQL Query ++++++++\n");
-var result = kernel.InvokeAsync(nl2TsqlTranslator, new() {
-            { "request", request } });
-string generatedQuery = result.Result.ToString();
-Console.WriteLine(generatedQuery);
-Console.WriteLine("\n+++++++++++++++++++++++++++++++++++++++++++");
+string generatedQuery = await GenerateTsqlQuery(kernel, nl2TsqlTranslator, request);
 
-Console.ForegroundColor = ConsoleColor.Red;
-Console.WriteLine("+++++++++ The Results of the Query ++++++++\n");
+ExecuteQuery(generatedQuery);
 
-using (IDbConnection db = new SqlConnection("Data Source=(localdb)\\tsql;Initial Catalog=Northwind;Integrated Security=True;Encrypt=True"))
+static async Task<string> GenerateTsqlQuery(Kernel kernel, KernelFunction nl2TsqlTranslator, string request)
 {
-    var queryResult = db.Query(generatedQuery);
-    var options = new JsonSerializerOptions
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("++++++++ The Generated T-SQL Query ++++++++\n");
+
+    var result = kernel.InvokeStreamingAsync(nl2TsqlTranslator, new() {
+            { "request", request } });
+
+    string generatedQuery = string.Empty;
+    await foreach (var content in result)
     {
-        WriteIndented = true
-    };
-    var json = JsonSerializer.Serialize(queryResult,options);
-    Console.WriteLine(json);
+        Console.Write(content);
+        generatedQuery += content.ToString();
+    }
+
+    Console.WriteLine("\n\n+++++++++++++++++++++++++++++++++++++++++++");
+    Console.ForegroundColor = ConsoleColor.White;
+    return generatedQuery!;
 }
-Console.WriteLine("\n+++++++++++++++++++++++++++++++++++++++++++");
-Console.ForegroundColor = ConsoleColor.White;
+
+static void ExecuteQuery(string generatedQuery)
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("+++++++++ The Results of the Query ++++++++\n");
+
+    using (IDbConnection db = new SqlConnection("Data Source=(localdb)\\tsql;Initial Catalog=Northwind;Integrated Security=True;Encrypt=True"))
+    {
+        try
+        {
+            var queryResult = db.Query(generatedQuery);
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+            var json = JsonSerializer.Serialize(queryResult, options);
+            Console.WriteLine(json);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("An Exception Occured while executing generated query");
+            Console.WriteLine(ex.ToString());
+        }
+    }
+    Console.WriteLine("\n+++++++++++++++++++++++++++++++++++++++++++");
+    Console.ForegroundColor = ConsoleColor.White;
+}
