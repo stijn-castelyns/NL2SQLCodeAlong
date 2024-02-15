@@ -6,12 +6,14 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
+using NL2SQL.Terminal.Configuration;
+using NL2SQL.Terminal.Infra;
 using System.Data;
 using System.Reflection;
 using System.Text.Json;
 using System.Xml;
 
-(AzureKeyCredential? azureKeyCredential, string? deploymentName, Uri? endpoint) = LoadConfiguration();
+(AzureKeyCredential? azureKeyCredential, string? deploymentName, Uri? endpoint) = SetUp.LoadConfiguration();
 OpenAIClient openAIClient = new(endpoint, azureKeyCredential);
 
 IKernelBuilder builder = Kernel.CreateBuilder();
@@ -27,11 +29,8 @@ KernelFunction nl2TsqlTranslator = kernel.CreateFunctionFromPromptYaml(
     promptTemplateFactory: new HandlebarsPromptTemplateFactory()
 );
 
-Console.ForegroundColor = ConsoleColor.Green;
-Console.WriteLine("Assistant > Hello! I am an assistant that let's you use natural language to query the Northwind Sql Server database. How can I be of use to you?");
-Console.ForegroundColor = ConsoleColor.Cyan;
-Console.Write("User > ");
-var request = Console.ReadLine()!;
+Terminal.PrintAssistantMessage("Hello! I am an assistant that let's you use natural language to query the Northwind Sql Server database. How can I be of use to you?");
+string request = Terminal.GetUserInput();
 
 Console.ForegroundColor = ConsoleColor.Yellow;
 Console.WriteLine("++++++++ The Generated T-SQL Query ++++++++\n");
@@ -56,15 +55,3 @@ using (IDbConnection db = new SqlConnection("Data Source=(localdb)\\tsql;Initial
 }
 Console.WriteLine("\n+++++++++++++++++++++++++++++++++++++++++++");
 Console.ForegroundColor = ConsoleColor.White;
-(AzureKeyCredential? azureKeyCredential, string? deploymentName, Uri? endpoint) LoadConfiguration()
-{
-    IConfigurationRoot config = new ConfigurationBuilder()
-        .AddUserSecrets<Program>()
-        .Build();
-
-    AzureKeyCredential? azureKeyCredential = new(config["AzureOpenAI:AzureKeyCredential"]);
-    string? deploymentName = config["AzureOpenAI:DeploymentName"];
-    Uri? endpoint = new Uri(config["AzureOpenAI:Endpoint"]);
-
-    return (azureKeyCredential, deploymentName, endpoint);
-}
