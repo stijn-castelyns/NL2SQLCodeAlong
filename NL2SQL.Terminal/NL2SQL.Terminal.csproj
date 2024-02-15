@@ -9,6 +9,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Dapper" Version="2.1.28" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
 		<PackageReference Include="Microsoft.SemanticKernel" Version="1.4.0" />
 		<PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.4.0" />
@@ -17,10 +19,6 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="Prompts\**\*.yaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\NL2SQL.Infra\NL2SQL.Infra.csproj" />
 	</ItemGroup>
 
 </Project>

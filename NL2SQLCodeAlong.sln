@@ -5,8 +5,6 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NL2SQL.Terminal", "NL2SQL.Terminal\NL2SQL.Terminal.csproj", "{A78B5D28-0F52-4E85-A935-E85365F030A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NL2SQL.Infra", "NL2SQL.Infra\NL2SQL.Infra.csproj", "{1EF5AC48-1B59-4CF3-8463-2BBD40F52AA5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{A78B5D28-0F52-4E85-A935-E85365F030A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A78B5D28-0F52-4E85-A935-E85365F030A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A78B5D28-0F52-4E85-A935-E85365F030A7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1EF5AC48-1B59-4CF3-8463-2BBD40F52AA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EF5AC48-1B59-4CF3-8463-2BBD40F52AA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1EF5AC48-1B59-4CF3-8463-2BBD40F52AA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EF5AC48-1B59-4CF3-8463-2BBD40F52AA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
