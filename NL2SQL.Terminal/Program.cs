@@ -38,18 +38,23 @@ KernelFunction nl2TsqlTranslator = kernel.CreateFunctionFromPromptYaml(
 
 kernel.Plugins.AddFromFunctions("TSqlTranslator", [nl2TsqlTranslator]);
 
-
 Terminal.PrintAssistantMessage("Hello! I am an assistant that let's you use natural language to query the Northwind Sql Server database. How can I be of use to you?");
-string request = Terminal.GetUserInput();
 
-var generatedQueryStream = kernel
-                            .InvokeStreamingAsync(pluginName:"TSqlTranslator", 
-                                                  functionName:"nl2TsqlTranslator", 
-                                                  arguments: new() {{ "request", request }});
+while (true)
+{
+    string request = Terminal.GetUserInput();
 
-string generatedQuery = await Terminal.GenerateTsqlQuery(generatedQueryStream);
+    var generatedQueryStream = kernel
+                                .InvokeStreamingAsync(pluginName: "TSqlTranslator",
+                                                      functionName: "nl2TsqlTranslator",
+                                                      arguments: new() { { "request", request },
+                                                                         { "tableDefinitions", TableProvider.GetTableDefinitions()} });
 
-var queryResult = kernel.GetRequiredService<QueryExecutor>()
-                        .ExecuteQuery(generatedQuery);
+    string generatedQuery = await Terminal.GenerateTsqlQuery(generatedQueryStream);
 
-Terminal.PrintTable(queryResult);
+    var queryResult = kernel.GetRequiredService<QueryExecutor>()
+                            .ExecuteQuery(generatedQuery);
+
+    Terminal.PrintTable(queryResult);
+    Terminal.PrintAssistantMessage("Can I help you with anything else?");
+}
