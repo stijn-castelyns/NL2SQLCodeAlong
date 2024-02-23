@@ -1,5 +1,6 @@
 ﻿using ConsoleTables;
 using Microsoft.SemanticKernel;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,8 +54,16 @@ internal static class Terminal
     {
         IDictionary<string, object> propertyValues = (IDictionary<string, object>)queryResult.First();
         string[] propertyNames = propertyValues.Keys.ToArray();
+        TableColumn[] tableColumns = propertyNames.Select(pn => new TableColumn(pn).Centered())
+                                                  .ToArray();
 
-        var table = new ConsoleTable(propertyNames);
+        var table = new Table();
+        table.Centered();
+        table.AddColumns(tableColumns);
+        table.Border(TableBorder.Rounded);
+        table.Columns.Select(c => c.NoWrap());
+        table.Expand();
+        table.Title = new TableTitle("Query Results");
 
         foreach (var item in queryResult)
         {
@@ -63,6 +72,6 @@ internal static class Terminal
             var row = dict.Values.Select(value => value?.ToString()).ToArray();
             table.AddRow(row);
         }
-        table.Write();
+        AnsiConsole.Write(table);
     }
 }
